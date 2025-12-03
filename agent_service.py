@@ -39,7 +39,7 @@ async def start_call_agent(call_type: str, call_id: str, user_id: str, user_name
 
     try:
         # 🟢 THE FIX IS HERE: Await the agent.join(call) method itself
-        async with await agent.join(call):
+        with await agent.join(call):
             logger.info(f"Agent joined call {call_id}.")
 
             # Send initial message (agent speaks this)
