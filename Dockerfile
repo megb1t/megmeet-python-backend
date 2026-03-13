@@ -8,6 +8,11 @@ WORKDIR /app
 
 # Enable bytecode compilation for faster startup
 ENV UV_COMPILE_BYTECODE=1
+# Add this line near the top of your Dockerfile
+ENV PIP_EXTRA_INDEX_URL=https://download.pytorch.org/whl/cpu
+
+# Then proceed with your uv sync
+
 
 # Install dependencies using the lockfile
 # We use mounts to avoid copying large cache files into the final image
