@@ -1,25 +1,21 @@
 # --- Stage 1: Build ---
-
-
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS builder
 
 # Set the working directory
 WORKDIR /app
 
-# Enable bytecode compilation for faster startup
+# Enable bytecode compilation and force full file copy mode to prevent filesystem copy errors
 ENV UV_COMPILE_BYTECODE=1
-# Add this line near the top of your Dockerfile
+ENV UV_LINK_MODE=copy
+
+# Use CPU wheels to avoid massive CUDA library size issues if a GPU isn't required on this instance
 ENV PIP_EXTRA_INDEX_URL=https://download.pytorch.org/whl/cpu
 
-# Then proceed with your uv sync
-
-
-# Install dependencies using the lockfile
-# We use mounts to avoid copying large cache files into the final image
+# Install dependencies using the lockfile with caching
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-install-project --no-dev
+    uv sync --frozen --no-install-project --no-dev --link-mode=copy
 
 # --- Stage 2: Runtime ---
 FROM python:3.12-slim
